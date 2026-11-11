@@ -49,6 +49,11 @@ import {
   Sliders,
   User,
   MoveVertical,
+  Calendar,
+  Clock,
+  DollarSign,
+  Tag,
+  Briefcase,
 } from 'lucide-react';
 import {
   LinkItem,
@@ -64,10 +69,11 @@ import {
   PopIntensity,
   BackgroundPlaneStyle,
   AvatarShape,
+  ServiceItem,
 } from '../types';
 import { storageService } from '../services/storage';
 import { AVAILABLE_ICONS, IconRenderer } from './IconRenderer';
-import { THEME_PRESETS } from '../data/defaultData';
+import { THEME_PRESETS, DEFAULT_SERVICES } from '../data/defaultData';
 import { ICON_3D_PRESETS } from '../data/icon3dPresets';
 import { AVATAR_PHOTO_PRESETS } from '../data/avatarPhotoPresets';
 import { extractYouTubeId, getYouTubeThumbnail, formatSocialUrl } from '../utils/youtube';
@@ -87,7 +93,7 @@ interface AdminModalProps {
   onSimulateClick: (linkId: string) => void;
 }
 
-type TabType = 'analytics' | 'links' | 'video' | 'social' | 'texts' | 'appearance' | 'security' | 'backup';
+type TabType = 'analytics' | 'links' | 'services' | 'video' | 'social' | 'texts' | 'appearance' | 'security' | 'backup';
 
 const AVATAR_PRESETS = [
   {
@@ -145,6 +151,11 @@ export const AdminModal: React.FC<AdminModalProps> = ({
   // Link Editor State (Add or Edit)
   const [editingLink, setEditingLink] = useState<LinkItem | null>(null);
   const [isAddingLink, setIsAddingLink] = useState(false);
+
+  // Service Editor State (Add or Edit)
+  const [editingService, setEditingService] = useState<ServiceItem | null>(null);
+  const [isAddingService, setIsAddingService] = useState(false);
+  const [deletingServiceId, setDeletingServiceId] = useState<string | null>(null);
 
   // Add new social network state
   const [isAddingSocial, setIsAddingSocial] = useState(false);
@@ -266,6 +277,61 @@ export const AdminModal: React.FC<AdminModalProps> = ({
 
     onUpdateLinks(newLinks);
     storageService.saveLinks(newLinks);
+  };
+
+  // Service Actions
+  const currentServices: ServiceItem[] = profile.services || DEFAULT_SERVICES;
+
+  const handleSaveService = (serviceToSave: ServiceItem) => {
+    let updatedServices: ServiceItem[];
+    if (isAddingService) {
+      updatedServices = [...currentServices, serviceToSave];
+    } else {
+      updatedServices = currentServices.map((s) => (s.id === serviceToSave.id ? serviceToSave : s));
+    }
+    const updatedProfile = { ...profile, services: updatedServices };
+    onUpdateProfile(updatedProfile);
+    storageService.saveProfile(updatedProfile);
+    setIsAddingService(false);
+    setEditingService(null);
+    showNotification(isAddingService ? 'Servicio agregado con éxito' : 'Servicio actualizado');
+  };
+
+  const handleConfirmDeleteService = (id: string) => {
+    const updatedServices = currentServices.filter((s) => s.id !== id);
+    const updatedProfile = { ...profile, services: updatedServices };
+    onUpdateProfile(updatedProfile);
+    storageService.saveProfile(updatedProfile);
+    setDeletingServiceId(null);
+    showNotification('Servicio eliminado con éxito');
+  };
+
+  const handleToggleServiceActive = (id: string) => {
+    const updatedServices = currentServices.map((s) => (s.id === id ? { ...s, active: !s.active } : s));
+    const updatedProfile = { ...profile, services: updatedServices };
+    onUpdateProfile(updatedProfile);
+    storageService.saveProfile(updatedProfile);
+  };
+
+  const handleMoveService = (index: number, direction: 'up' | 'down') => {
+    const targetIndex = direction === 'up' ? index - 1 : index + 1;
+    if (targetIndex < 0 || targetIndex >= currentServices.length) return;
+
+    const newServices = [...currentServices];
+    const temp = newServices[index];
+    newServices[index] = newServices[targetIndex];
+    newServices[targetIndex] = temp;
+
+    const updatedProfile = { ...profile, services: newServices };
+    onUpdateProfile(updatedProfile);
+    storageService.saveProfile(updatedProfile);
+  };
+
+  const handleResetServices = () => {
+    const updatedProfile = { ...profile, services: DEFAULT_SERVICES };
+    onUpdateProfile(updatedProfile);
+    storageService.saveProfile(updatedProfile);
+    showNotification('Servicios restablecidos a valores por defecto');
   };
 
   // Theme Preset Change
@@ -645,6 +711,18 @@ export const AdminModal: React.FC<AdminModalProps> = ({
           >
             <LayoutGrid className="w-4 h-4" />
             <span>Enlaces ({links.length})</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('services')}
+            className={`flex items-center gap-2 px-3.5 py-2 text-xs font-semibold rounded-xl transition-all whitespace-nowrap cursor-pointer ${
+              activeTab === 'services'
+                ? 'bg-amber-500 text-slate-950 shadow-md font-bold'
+                : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+            }`}
+          >
+            <Briefcase className="w-4 h-4" />
+            <span>Servicios & Turnos ({(profile.services || DEFAULT_SERVICES).length})</span>
           </button>
 
           <button
@@ -2777,6 +2855,383 @@ export const AdminModal: React.FC<AdminModalProps> = ({
                       className="px-5 py-2 text-xs font-bold rounded-xl bg-amber-500 text-slate-950 hover:bg-amber-400 transition-colors shadow-md cursor-pointer"
                     >
                       Guardar Enlace
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* ================= TAB: SERVICES & APPOINTMENTS ================= */}
+          {activeTab === 'services' && (
+            <div className="space-y-4 animate-fade-in">
+              {/* Quick links & Banner */}
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-4 rounded-2xl bg-gradient-to-r from-emerald-950/40 via-slate-900 to-amber-950/30 border border-emerald-500/30">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-sm font-bold text-white flex items-center gap-2">
+                      <Briefcase className="w-4 h-4 text-emerald-400" />
+                      <span>Catálogo de Servicios, Tarifas y Turnos</span>
+                    </h3>
+                    <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-semibold">
+                      WhatsApp
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-300 mt-1">
+                    Edita precios, duraciones y nombres. Se actualizan automáticamente en el agendador del BioLink, en <code className="text-amber-400">/turnos.html</code> y en <code className="text-emerald-400">/servicios.html</code>.
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-2 flex-wrap shrink-0">
+                  <a
+                    href="/servicios.html"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 transition-colors"
+                  >
+                    <span>Ver /servicios.html</span>
+                    <ExternalLink className="w-3 h-3" />
+                  </a>
+                  <a
+                    href="/turnos.html"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 transition-colors"
+                  >
+                    <span>Ver /turnos.html</span>
+                    <ExternalLink className="w-3 h-3" />
+                  </a>
+                </div>
+              </div>
+
+              {/* Action Toolbar */}
+              <div className="flex items-center justify-between flex-wrap gap-2 pt-1">
+                <div className="text-xs text-slate-400">
+                  Total de servicios: <strong className="text-white">{currentServices.length}</strong> ({currentServices.filter((s) => s.active).length} activos)
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={handleResetServices}
+                    className="flex items-center gap-1.5 px-3 py-2 text-xs font-semibold rounded-xl bg-slate-800 hover:bg-slate-750 text-slate-300 hover:text-white transition-colors border border-slate-750 cursor-pointer"
+                    title="Restablece la lista a los 5 servicios originales"
+                  >
+                    <RotateCcw className="w-3.5 h-3.5" />
+                    <span>Restablecer Defectos</span>
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      setEditingService({
+                        id: `srv-${Date.now()}`,
+                        name: '',
+                        price: '$40 USD',
+                        duration: '45 min',
+                        description: '',
+                        icon: '💼',
+                        badge: 'NUEVO',
+                        active: true,
+                      });
+                      setIsAddingService(true);
+                    }}
+                    className="flex items-center gap-1.5 px-4 py-2 text-xs font-bold rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 transition-all shadow-md shadow-amber-500/20 active:scale-95 cursor-pointer"
+                  >
+                    <Plus className="w-4 h-4" />
+                    <span>Agregar Servicio</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Delete Service Confirmation Modal */}
+              {deletingServiceId && (
+                <div className="p-4 rounded-2xl bg-rose-500/10 border border-rose-500/30 flex items-center justify-between gap-4 animate-fade-in">
+                  <div className="flex items-center gap-3 text-rose-300 text-xs">
+                    <AlertCircle className="w-5 h-5 shrink-0" />
+                    <span>¿Confirmas que deseas eliminar este servicio permanentemente?</span>
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <button
+                      onClick={() => setDeletingServiceId(null)}
+                      className="px-3 py-1.5 text-xs rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-750 cursor-pointer"
+                    >
+                      Cancelar
+                    </button>
+                    <button
+                      onClick={() => handleConfirmDeleteService(deletingServiceId)}
+                      className="px-3 py-1.5 text-xs font-bold rounded-lg bg-rose-600 text-white hover:bg-rose-500 cursor-pointer"
+                    >
+                      Sí, Eliminar
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Services List Cards */}
+              <div className="space-y-2.5">
+                {currentServices.map((srv, idx) => (
+                  <div
+                    key={srv.id}
+                    className={`flex items-center justify-between p-3.5 sm:p-4 rounded-2xl border transition-all ${
+                      srv.active
+                        ? 'bg-slate-950/80 border-slate-800 hover:border-slate-700'
+                        : 'bg-slate-950/40 border-slate-850 opacity-60'
+                    }`}
+                  >
+                    {/* Left: Icon, Name, Price, Duration */}
+                    <div className="flex items-center gap-3.5 min-w-0 pr-3">
+                      <div className="w-11 h-11 rounded-2xl bg-slate-900 border border-slate-800 flex items-center justify-center text-2xl shrink-0 shadow-inner">
+                        {srv.icon || '💼'}
+                      </div>
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <h4 className="text-sm font-bold text-white truncate">{srv.name}</h4>
+                          {srv.badge && (
+                            <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 font-semibold">
+                              {srv.badge}
+                            </span>
+                          )}
+                          {!srv.active && (
+                            <span className="text-[10px] px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 font-medium">
+                              Inactivo
+                            </span>
+                          )}
+                        </div>
+                        {srv.description && (
+                          <p className="text-xs text-slate-400 line-clamp-1 mt-0.5">{srv.description}</p>
+                        )}
+                        <div className="flex items-center gap-2.5 text-xs mt-1">
+                          <span className="font-bold text-emerald-400 font-mono bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+                            {srv.price || 'A convenir'}
+                          </span>
+                          {srv.duration && (
+                            <span className="text-slate-400 flex items-center gap-1 text-[11px]">
+                              <Clock className="w-3 h-3 text-slate-500" />
+                              <span>{srv.duration}</span>
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Right: Actions */}
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      {/* Active toggle */}
+                      <button
+                        onClick={() => handleToggleServiceActive(srv.id)}
+                        className={`p-2 rounded-xl text-xs font-semibold transition-colors cursor-pointer ${
+                          srv.active
+                            ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/25'
+                            : 'bg-slate-800 text-slate-400 border border-slate-700 hover:bg-slate-750'
+                        }`}
+                        title={srv.active ? 'Desactivar servicio' : 'Activar servicio'}
+                      >
+                        {srv.active ? <Check className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
+                      </button>
+
+                      {/* Move Up */}
+                      <button
+                        onClick={() => handleMoveService(idx, 'up')}
+                        disabled={idx === 0}
+                        className="p-2 text-slate-400 hover:text-white rounded-xl bg-slate-900 hover:bg-slate-800 disabled:opacity-30 disabled:hover:text-slate-400 transition-colors border border-slate-800 cursor-pointer"
+                        title="Subir posición"
+                      >
+                        <ArrowUp className="w-3.5 h-3.5" />
+                      </button>
+
+                      {/* Move Down */}
+                      <button
+                        onClick={() => handleMoveService(idx, 'down')}
+                        disabled={idx === currentServices.length - 1}
+                        className="p-2 text-slate-400 hover:text-white rounded-xl bg-slate-900 hover:bg-slate-800 disabled:opacity-30 disabled:hover:text-slate-400 transition-colors border border-slate-800 cursor-pointer"
+                        title="Bajar posición"
+                      >
+                        <ArrowDown className="w-3.5 h-3.5" />
+                      </button>
+
+                      {/* Edit */}
+                      <button
+                        onClick={() => {
+                          setEditingService({ ...srv });
+                          setIsAddingService(false);
+                        }}
+                        className="p-2 text-slate-300 hover:text-amber-400 rounded-xl bg-slate-900 hover:bg-slate-800 transition-colors border border-slate-800 cursor-pointer"
+                        title="Editar servicio"
+                      >
+                        <Edit2 className="w-3.5 h-3.5" />
+                      </button>
+
+                      {/* Delete */}
+                      <button
+                        onClick={() => setDeletingServiceId(srv.id)}
+                        className="p-2 text-slate-400 hover:text-rose-400 rounded-xl bg-slate-900 hover:bg-slate-800 transition-colors border border-slate-800 cursor-pointer"
+                        title="Eliminar servicio"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Service Editor Modal/Card */}
+              {editingService && (
+                <div className="p-5 sm:p-6 rounded-3xl bg-slate-950 border border-amber-500/40 space-y-4 shadow-2xl mt-4 animate-fade-in">
+                  <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+                    <h4 className="text-sm font-bold text-white flex items-center gap-2">
+                      <span className="text-xl">{editingService.icon || '💼'}</span>
+                      <span>{isAddingService ? 'Agregar Nuevo Servicio' : `Editar: ${editingService.name || 'Servicio'}`}</span>
+                    </h4>
+                    <button
+                      onClick={() => {
+                        setEditingService(null);
+                        setIsAddingService(false);
+                      }}
+                      className="p-1.5 text-slate-400 hover:text-white rounded-lg bg-slate-900 cursor-pointer"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {/* Name */}
+                    <div className="sm:col-span-2">
+                      <label className="block text-xs font-semibold text-slate-300 mb-1">
+                        Nombre del Servicio *
+                      </label>
+                      <input
+                        type="text"
+                        value={editingService.name}
+                        onChange={(e) => setEditingService({ ...editingService, name: e.target.value })}
+                        placeholder="Ej: Asesoría Personalizada 1 a 1"
+                        className="w-full px-3.5 py-2.5 text-xs rounded-xl bg-slate-900 border border-slate-750 text-white placeholder-slate-500 focus:outline-none focus:border-amber-500"
+                      />
+                    </div>
+
+                    {/* Price */}
+                    <div>
+                      <label className="block text-xs font-semibold text-slate-300 mb-1 flex items-center gap-1.5">
+                        <DollarSign className="w-3.5 h-3.5 text-emerald-400" />
+                        <span>Precio / Tarifa *</span>
+                      </label>
+                      <input
+                        type="text"
+                        value={editingService.price}
+                        onChange={(e) => setEditingService({ ...editingService, price: e.target.value })}
+                        placeholder="Ej: $50 USD, €40, Gratis, A consultar"
+                        className="w-full px-3.5 py-2.5 text-xs rounded-xl bg-slate-900 border border-slate-750 text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 font-mono"
+                      />
+                    </div>
+
+                    {/* Duration */}
+                    <div>
+                      <label className="block text-xs font-semibold text-slate-300 mb-1 flex items-center gap-1.5">
+                        <Clock className="w-3.5 h-3.5 text-amber-400" />
+                        <span>Duración Estimada</span>
+                      </label>
+                      <input
+                        type="text"
+                        value={editingService.duration || ''}
+                        onChange={(e) => setEditingService({ ...editingService, duration: e.target.value })}
+                        placeholder="Ej: 45 min, 1 hora, 30 min"
+                        className="w-full px-3.5 py-2.5 text-xs rounded-xl bg-slate-900 border border-slate-750 text-white placeholder-slate-500 focus:outline-none focus:border-amber-500"
+                      />
+                    </div>
+
+                    {/* Badge */}
+                    <div>
+                      <label className="block text-xs font-semibold text-slate-300 mb-1 flex items-center gap-1.5">
+                        <Tag className="w-3.5 h-3.5 text-purple-400" />
+                        <span>Etiqueta / Badge (Opcional)</span>
+                      </label>
+                      <input
+                        type="text"
+                        value={editingService.badge || ''}
+                        onChange={(e) => setEditingService({ ...editingService, badge: e.target.value })}
+                        placeholder="Ej: MÁS SOLICITADO, OFERTA, NUEVO"
+                        className="w-full px-3.5 py-2.5 text-xs rounded-xl bg-slate-900 border border-slate-750 text-white placeholder-slate-500 focus:outline-none focus:border-amber-500 uppercase"
+                      />
+                    </div>
+
+                    {/* Emoji Icon */}
+                    <div>
+                      <label className="block text-xs font-semibold text-slate-300 mb-1">
+                        Emoji / Icono
+                      </label>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="text"
+                          value={editingService.icon || '💼'}
+                          onChange={(e) => setEditingService({ ...editingService, icon: e.target.value })}
+                          className="w-16 px-3 py-2 text-center text-lg rounded-xl bg-slate-900 border border-slate-750 text-white focus:outline-none focus:border-amber-500"
+                        />
+                        <div className="flex items-center gap-1 flex-wrap">
+                          {['💼', '🗓️', '📊', '💻', '📍', '⭐', '🚀', '💡', '🎯', '🛠️'].map((em) => (
+                            <button
+                              key={em}
+                              type="button"
+                              onClick={() => setEditingService({ ...editingService, icon: em })}
+                              className="p-1.5 text-sm rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-800 cursor-pointer"
+                            >
+                              {em}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Description */}
+                    <div className="sm:col-span-2">
+                      <label className="block text-xs font-semibold text-slate-300 mb-1">
+                        Descripción o Detalles del Servicio
+                      </label>
+                      <textarea
+                        rows={2}
+                        value={editingService.description || ''}
+                        onChange={(e) => setEditingService({ ...editingService, description: e.target.value })}
+                        placeholder="Describe qué incluye el servicio, beneficios o metodología..."
+                        className="w-full px-3.5 py-2.5 text-xs rounded-xl bg-slate-900 border border-slate-750 text-white placeholder-slate-500 focus:outline-none focus:border-amber-500 resize-none"
+                      />
+                    </div>
+
+                    {/* Active toggle */}
+                    <div className="sm:col-span-2 flex items-center justify-between p-3 rounded-xl bg-slate-900 border border-slate-800">
+                      <div>
+                        <div className="text-xs font-semibold text-white">Servicio Activo</div>
+                        <div className="text-[11px] text-slate-400">Si está inactivo, no se mostrará para reservar turnos.</div>
+                      </div>
+                      <input
+                        type="checkbox"
+                        checked={editingService.active}
+                        onChange={(e) => setEditingService({ ...editingService, active: e.target.checked })}
+                        className="w-4 h-4 accent-amber-500 rounded cursor-pointer"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Footer actions */}
+                  <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-800">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setEditingService(null);
+                        setIsAddingService(false);
+                      }}
+                      className="px-4 py-2 text-xs rounded-xl bg-slate-800 text-slate-300 hover:bg-slate-750 cursor-pointer"
+                    >
+                      Cancelar
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (!editingService.name.trim()) {
+                          showNotification('Por favor ingresa un nombre para el servicio');
+                          return;
+                        }
+                        handleSaveService(editingService);
+                      }}
+                      className="px-5 py-2 text-xs font-bold rounded-xl bg-amber-500 text-slate-950 hover:bg-amber-400 transition-colors shadow-md cursor-pointer"
+                    >
+                      Guardar Servicio
                     </button>
                   </div>
                 </div>

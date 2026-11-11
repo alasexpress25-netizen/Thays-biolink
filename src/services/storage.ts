@@ -66,6 +66,7 @@ export const storageService = {
             ...DEFAULT_PROFILE.categoryFilters!,
             ...(parsed.categoryFilters || {}),
           },
+          services: parsed.services && Array.isArray(parsed.services) ? parsed.services : DEFAULT_PROFILE.services,
         };
       }
     } catch (e) {
@@ -268,8 +269,10 @@ export const storageService = {
   },
 
   exportClientConfigFile(): string {
+    const prof = this.getProfile();
     const data = {
-      profile: this.getProfile(),
+      profile: prof,
+      services: prof.services || DEFAULT_PROFILE.services,
       links: this.getLinks(),
       theme: this.getTheme(),
       password: this.getPassword(),
@@ -280,8 +283,10 @@ export const storageService = {
 
   async saveToDiskServer(): Promise<boolean> {
     try {
+      const prof = this.getProfile();
       const fullData = {
-        profile: this.getProfile(),
+        profile: prof,
+        services: prof.services || DEFAULT_PROFILE.services,
         links: this.getLinks(),
         theme: this.getTheme(),
         password: this.getPassword(),
