@@ -214,7 +214,19 @@
   </footer>
 
   <script>
-    let WA_NUMBER = '5548999053493';
+    let WA_NUMBER = '5548999053493'; // solo respaldo; se sobrescribe desde clientConfig.json
+    // Lee la config desde clientConfig.json (GitHub Pages) o /api/config (servidor local)
+    async function loadClientConfig() {
+      const urls = ['./clientConfig.json', '/api/config'];
+      for (const u of urls) {
+        try {
+          const res = await fetch(u, { cache: 'no-cache' });
+          if (!res.ok) continue;
+          return await res.json();
+        } catch (e) { /* probar la siguiente */ }
+      }
+      return null;
+    }
     let selectedTime = '10:00';
 
     // Parse URL parameter ?servicio=...
@@ -281,14 +293,13 @@
     // Try loading services dynamically from config
     (async function initServices() {
       try {
-        const res = await fetch('/api/config');
-        if (res.ok) {
-          const config = await res.json();
+        const config = await loadClientConfig();
+        if (config) {
           // Extract WhatsApp number if available in social links
           const waSocial = config.profile?.socialLinks?.find(s => s.platform === 'whatsapp' && s.active);
           if (waSocial?.url) {
-            const digits = waSocial.url.replace(/\D/g, '');
-            if (digits) WA_NUMBER = digits;
+            const m = waSocial.url.match(/wa\.me\/(\d+)/) || waSocial.url.match(/phone=(\d+)/);
+            if (m) WA_NUMBER = m[1];
           }
 
           const services = config.services || config.profile?.services;

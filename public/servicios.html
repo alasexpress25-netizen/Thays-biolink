@@ -379,11 +379,26 @@
 
   <!-- Script to dynamically load customized services if available from server -->
   <script>
+    // Lee la config desde clientConfig.json (GitHub Pages) o /api/config (servidor local)
+    async function loadClientConfig() {
+      const urls = ['./clientConfig.json', '/api/config'];
+      for (const u of urls) {
+        try {
+          const res = await fetch(u, { cache: 'no-cache' });
+          if (!res.ok) continue;
+          return await res.json();
+        } catch (e) { /* probar la siguiente */ }
+      }
+      return null;
+    }
     (async function loadDynamicServices() {
       try {
-        const res = await fetch('/api/config');
-        if (!res.ok) return;
-        const config = await res.json();
+        const config = await loadClientConfig();
+        if (!config) return;
+        const waSocial = config.profile?.socialLinks?.find(s => s.platform === 'whatsapp' && s.active);
+        const waM = waSocial?.url?.match(/wa\.me\/(\d+)/) || waSocial?.url?.match(/phone=(\d+)/);
+        const waDigits = waM ? waM[1] : '';
+        if (waDigits) document.querySelectorAll('a[href^="https://wa.me/"]').forEach(a => { a.href = 'https://wa.me/' + waDigits; });
         const services = config.services || config.profile?.services;
         if (!services || !Array.isArray(services) || services.length === 0) return;
 
