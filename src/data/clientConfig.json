@@ -3,8 +3,8 @@
     "name": "Unhas Imbituba",
     "handle": "@thayanacletounhas",
     "bio": "Esmaltação em gel e poda - Técnica Russa - Te entrego una cutícula impecáble",
-    "avatarUrl": "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=400&auto=format&fit=crop&q=80",
-    "verified": true,
+    "avatarUrl": "https://images.unsplash.com/photo-1544717305-2782549b5136?w=400&auto=format&fit=crop&q=80",
+    "verified": false,
     "location": "Alto Arroio - Imbituba",
     "footerText": "© Thays Anacleto unhas • Unhas Perfeitas",
     "featuredMedia": {
@@ -56,7 +56,7 @@
       "emptyStateText": "No hay enlaces en esta categoría.",
       "verifiedBadgeText": "Cursos e atendimento"
     },
-    "pwaIconUrl": "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=400&auto=format&fit=crop&q=80",
+    "pwaIconUrl": "https://images.unsplash.com/photo-1519817650390-64a93db51149?w=400&auto=format&fit=crop&q=80",
     "companyBranding": {
       "enabled": true,
       "name": "LA VISUAL MARKETING - Federico Sebastián Allan",
@@ -72,7 +72,10 @@
         "multimedia",
         "donations"
       ]
-    }
+    },
+    "browserTabTitle": "Thays Unhas",
+    "appName": "Thays Biolink",
+    "metaDescription": "Nossos link"
   },
   "links": [
     {
@@ -87,7 +90,7 @@
       },
       "animation": "pulse",
       "active": true,
-      "clicks": 1420,
+      "clicks": 0,
       "isPinned": true,
       "category": "community",
       "iconType": "custom",
@@ -113,7 +116,7 @@
       },
       "animation": "glow",
       "active": true,
-      "clicks": 980,
+      "clicks": 0,
       "isPinned": true,
       "category": "multimedia",
       "iconType": "custom",
@@ -153,88 +156,8 @@
       },
       "animation": "bounce",
       "active": true,
-      "clicks": 722,
+      "clicks": 2,
       "category": "community"
-    },
-    {
-      "id": "link-donations",
-      "title": "Siembra y Donaciones Solidarias",
-      "subtitle": "Apoya nuestros comedores sociales y proyectos de ayuda humanitaria",
-      "url": "https://donorbox.org/sample-elamortraspasa",
-      "icon": "heart",
-      "iconType": "custom",
-      "customImageUrl": "data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 120 120\">\n      <defs>\n        <radialGradient id=\"heartGrad\" cx=\"35%\" cy=\"30%\" r=\"70%\">\n          <stop offset=\"0%\" stop-color=\"%23fb7185\"/>\n          <stop offset=\"40%\" stop-color=\"%23e11d48\"/>\n          <stop offset=\"85%\" stop-color=\"%239f1239\"/>\n          <stop offset=\"100%\" stop-color=\"%234c0519\"/>\n        </radialGradient>\n        <filter id=\"heartShadow\" x=\"-20%\" y=\"-20%\" width=\"150%\" height=\"150%\">\n          <feDropShadow dx=\"0\" dy=\"10\" stdDeviation=\"7\" flood-color=\"%23881337\" flood-opacity=\"0.6\"/>\n        </filter>\n      </defs>\n      <path d=\"M60 96 C60 96 20 72 20 44 C20 28 32 18 46 18 C54 18 60 24 60 24 C60 24 66 18 74 18 C88 18 100 28 100 44 C100 72 60 96 60 96 Z\" fill=\"url(%23heartGrad)\" filter=\"url(%23heartShadow)\"/>\n      <ellipse cx=\"42\" cy=\"32\" rx=\"12\" ry=\"6\" transform=\"rotate(-25 42 32)\" fill=\"%23ffffff\" opacity=\"0.6\"/>\n      <circle cx=\"80\" cy=\"30\" r=\"4\" fill=\"%23ffffff\" opacity=\"0.4\"/>\n    </svg>",
-      "pop3d": {
-        "enabled": true,
-        "foregroundMotion": "float",
-        "popIntensity": "subtle",
-        "backgroundStyle": "darkened",
-        "interactiveTilt": true
-      },
-      "badge": {
-        "text": "SOLIDARIDAD",
-        "color": "rose"
-      },
-      "animation": "none",
-      "active": true,
-      "clicks": 654,
-      "category": "donations"
-    },
-    {
-      "id": "link-prayer",
-      "title": "Peticiones de Oración y Acompañamiento",
-      "subtitle": "Nuestro equipo pastoral ora por ti confidencialmente",
-      "url": "https://wa.me/34600000000?text=Hola,%20deseo%20hacer%20una%20peticion%20de%20oracion",
-      "icon": "sparkles",
-      "badge": {
-        "text": "CONFIDENCIAL",
-        "color": "amber"
-      },
-      "animation": "none",
-      "active": true,
-      "clicks": 532,
-      "category": "community"
-    },
-    {
-      "id": "link-podcast",
-      "title": "Podcast: El Amor Traspasa en Spotify",
-      "subtitle": "Reflexiones y prédicas en cualquier momento de tu día",
-      "url": "https://open.spotify.com/show/sample-podcast",
-      "icon": "music",
-      "badge": {
-        "text": "NUEVO EPISODIO",
-        "color": "purple"
-      },
-      "animation": "none",
-      "active": true,
-      "clicks": 418,
-      "category": "multimedia"
-    },
-    {
-      "id": "link-events",
-      "title": "Próximos Eventos y Retiros 2026",
-      "subtitle": "Calendario de actividades presenciales y virtuales",
-      "url": "https://elamortraspasa.com/eventos",
-      "icon": "calendar",
-      "badge": {
-        "text": "ABRIL 2026",
-        "color": "blue"
-      },
-      "animation": "none",
-      "active": true,
-      "clicks": 375,
-      "category": "general"
-    },
-    {
-      "id": "link-official-site",
-      "title": "Sitio Web Oficial El Amor Traspasa",
-      "subtitle": "Conoce nuestra historia, equipo y sedes en el mundo",
-      "url": "https://elamortraspasa.com",
-      "icon": "globe",
-      "animation": "none",
-      "active": true,
-      "clicks": 290,
-      "category": "general"
     }
   ],
   "theme": {
@@ -254,97 +177,5 @@
     "buttonSpacing": "normal",
     "buttonGapPx": 42
   },
-  "analytics": {
-    "totalVisits": 5873,
-    "totalClicks": 4673,
-    "recentEvents": [
-      {
-        "id": "ev-1794421562630-3p4p",
-        "linkId": "social-whatsapp",
-        "linkTitle": "Red Social: whatsapp",
-        "timestamp": 1794421562630,
-        "device": "desktop",
-        "referrer": "Google"
-      },
-      {
-        "id": "ev-1794421275129-oyrt",
-        "linkId": "link-courses",
-        "linkTitle": "Cursos e Aulas de Formação",
-        "timestamp": 1794421275129,
-        "device": "desktop",
-        "referrer": "Directo"
-      },
-      {
-        "id": "ev-1794421263190-1rez",
-        "linkId": "link-courses",
-        "linkTitle": "Cursos e Aulas de Formação",
-        "timestamp": 1794421263190,
-        "device": "desktop",
-        "referrer": "Directo"
-      },
-      {
-        "id": "ev-1793151735601-u9hy",
-        "linkId": "company-logo",
-        "linkTitle": "LA VISUAL MARKETING",
-        "timestamp": 1793151735601,
-        "device": "desktop",
-        "referrer": "YouTube"
-      },
-      {
-        "id": "ev-1",
-        "linkId": "link-whatsapp-group",
-        "linkTitle": "Comunidad Oficial en WhatsApp",
-        "timestamp": 1793150036371,
-        "device": "mobile",
-        "referrer": "WhatsApp"
-      },
-      {
-        "id": "ev-2",
-        "linkId": "link-youtube-live",
-        "linkTitle": "Transmisión en Vivo Domingos",
-        "timestamp": 1793149496371,
-        "device": "mobile",
-        "referrer": "Instagram"
-      },
-      {
-        "id": "ev-3",
-        "linkId": "link-donations",
-        "linkTitle": "Siembra y Donaciones Solidarias",
-        "timestamp": 1793148716371,
-        "device": "desktop",
-        "referrer": "Directo"
-      },
-      {
-        "id": "ev-4",
-        "linkId": "link-prayer",
-        "linkTitle": "Peticiones de Oración y Acompañamiento",
-        "timestamp": 1793147696371,
-        "device": "mobile",
-        "referrer": "TikTok"
-      },
-      {
-        "id": "ev-5",
-        "linkId": "link-podcast",
-        "linkTitle": "Podcast: El Amor Traspasa en Spotify",
-        "timestamp": 1793146136371,
-        "device": "mobile",
-        "referrer": "Instagram"
-      }
-    ],
-    "referrerCounts": {
-      "WhatsApp": 1840,
-      "Instagram": 1420,
-      "Directo": 782,
-      "TikTok": 420,
-      "YouTube": 155,
-      "Google": 56
-    },
-    "deviceCounts": {
-      "mobile": 3820,
-      "desktop": 714,
-      "tablet": 139
-    }
-  },
-  "version": "1.0.0",
-  "exportedAt": "2026-11-11T19:24:19.872Z"
+  "password": "admin123"
 }
