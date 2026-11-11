@@ -75,8 +75,112 @@
         "multimedia",
         "donations"
       ]
-    }
+    },
+    "services": [
+      {
+        "id": "srv-1",
+        "name": "Asesoría Personalizada",
+        "duration": "45 min",
+        "price": "$50 USD",
+        "description": "Sesión 1 a 1 de consultoría estratégica, análisis de requerimientos y plan de acción inmediato.",
+        "icon": "💼",
+        "badge": "MÁS ELEGIDO",
+        "active": true
+      },
+      {
+        "id": "srv-2",
+        "name": "Consulta / Turno General",
+        "duration": "30 min",
+        "price": "$30 USD",
+        "description": "Atención general, dudas técnicas o comerciales y diagnóstico inicial.",
+        "icon": "🗓️",
+        "badge": "RÁPIDO",
+        "active": true
+      },
+      {
+        "id": "srv-3",
+        "name": "Presupuesto de Proyecto",
+        "duration": "30 min",
+        "price": "Gratis",
+        "description": "Evaluación personalizada sin costo para sitios web, tiendas online y marketing digital.",
+        "icon": "📊",
+        "badge": "SIN COSTO",
+        "active": true
+      },
+      {
+        "id": "srv-4",
+        "name": "Reunión Virtual (Online)",
+        "duration": "45 min",
+        "price": "$45 USD",
+        "description": "Videollamada por Google Meet / Zoom con pantalla compartida y asesoramiento en vivo.",
+        "icon": "💻",
+        "badge": "ONLINE",
+        "active": true
+      },
+      {
+        "id": "srv-5",
+        "name": "Turno Presencial",
+        "duration": "60 min",
+        "price": "$65 USD",
+        "description": "Encuentro presencial para coordinación integral, firma de acuerdos y revisión.",
+        "icon": "📍",
+        "badge": "PRESENCIAL",
+        "active": true
+      }
+    ]
   },
+  "services": [
+    {
+      "id": "srv-1",
+      "name": "Asesoría Personalizada",
+      "duration": "45 min",
+      "price": "$50 USD",
+      "description": "Sesión 1 a 1 de consultoría estratégica, análisis de requerimientos y plan de acción inmediato.",
+      "icon": "💼",
+      "badge": "MÁS ELEGIDO",
+      "active": true
+    },
+    {
+      "id": "srv-2",
+      "name": "Consulta / Turno General",
+      "duration": "30 min",
+      "price": "$30 USD",
+      "description": "Atención general, dudas técnicas o comerciales y diagnóstico inicial.",
+      "icon": "🗓️",
+      "badge": "RÁPIDO",
+      "active": true
+    },
+    {
+      "id": "srv-3",
+      "name": "Presupuesto de Proyecto",
+      "duration": "30 min",
+      "price": "Gratis",
+      "description": "Evaluación personalizada sin costo para sitios web, tiendas online y marketing digital.",
+      "icon": "📊",
+      "badge": "SIN COSTO",
+      "active": true
+    },
+    {
+      "id": "srv-4",
+      "name": "Reunión Virtual (Online)",
+      "duration": "45 min",
+      "price": "$45 USD",
+      "description": "Videollamada por Google Meet / Zoom con pantalla compartida y asesoramiento en vivo.",
+      "icon": "💻",
+      "badge": "ONLINE",
+      "active": true
+    },
+    {
+      "id": "srv-5",
+      "name": "Turno Presencial",
+      "duration": "60 min",
+      "price": "$65 USD",
+      "description": "Encuentro presencial para coordinación integral, firma de acuerdos y revisión.",
+      "icon": "📍",
+      "badge": "PRESENCIAL",
+      "active": true
+    }
+  ],
   "links": [
     {
       "id": "link-whatsapp-group",
@@ -156,43 +260,60 @@
       },
       "animation": "bounce",
       "active": true,
-      "clicks": 0,
+      "clicks": 2,
       "category": "community"
     }
   ],
   "theme": {
-    "presetId": "elamor",
+    "presetId": "oasis",
     "bgType": "gradient",
-    "bgGradient": "from-amber-950 via-slate-950 to-rose-950",
-    "bgSolidColor": "#0f172a",
+    "bgGradient": "from-emerald-950 via-teal-950 to-slate-950",
+    "bgSolidColor": "#022c22",
     "cardStyle": "glass",
-    "cardBgColor": "rgba(255, 255, 255, 0.08)",
-    "cardTextColor": "#ffffff",
-    "cardBorderColor": "rgba(245, 158, 11, 0.35)",
-    "accentColor": "#f59e0b",
+    "cardBgColor": "rgba(6, 78, 59, 0.45)",
+    "cardTextColor": "#ecfdf5",
+    "cardBorderColor": "rgba(16, 185, 129, 0.3)",
+    "accentColor": "#10b981",
     "borderRadius": "rounded-2xl",
     "fontStyle": "sans",
     "buttonHoverEffect": "scale",
     "showBackgroundBubbles": true,
     "buttonSpacing": "normal",
-    "buttonGapPx": 20
+    "buttonGapPx": 42
   },
   "password": "admin123",
   "analytics": {
-    "totalVisits": 0,
-    "totalClicks": 0,
-    "recentEvents": [],
+    "totalVisits": 33,
+    "totalClicks": 2,
+    "recentEvents": [
+      {
+        "id": "ev-1794425596521-2wti",
+        "linkId": "link-courses",
+        "linkTitle": "Cursos e Aulas de Formação",
+        "timestamp": 1794425596521,
+        "device": "desktop",
+        "referrer": "TikTok"
+      },
+      {
+        "id": "ev-1794425586812-z91d",
+        "linkId": "link-courses",
+        "linkTitle": "Cursos e Aulas de Formação",
+        "timestamp": 1794425586812,
+        "device": "desktop",
+        "referrer": "Instagram"
+      }
+    ],
     "referrerCounts": {
       "WhatsApp": 0,
-      "Instagram": 0,
+      "Instagram": 1,
       "Directo": 0,
-      "TikTok": 0,
+      "TikTok": 1,
       "YouTube": 0,
       "Google": 0
     },
     "deviceCounts": {
       "mobile": 0,
-      "desktop": 0,
+      "desktop": 2,
       "tablet": 0
     }
   }
