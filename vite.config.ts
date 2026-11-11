@@ -17,6 +17,18 @@ export default defineConfig(() => {
       react(),
       tailwindcss(),
       {
+        // Publica src/data/clientConfig.json como /clientConfig.json en dist,
+        // para que las páginas estáticas (turnos.html, servicios.html) lo lean.
+        name: 'emit-client-config',
+        generateBundle() {
+          this.emitFile({
+            type: 'asset',
+            fileName: 'clientConfig.json',
+            source: JSON.stringify(clientConfig),
+          });
+        },
+      },
+      {
         name: 'html-transform',
         transformIndexHtml(html: string) {
           return html
@@ -62,7 +74,11 @@ export default defineConfig(() => {
           ],
         },
         workbox: {
-          globPatterns: ['**/*.{js,css,html,ico,png,svg,woff,woff2}'],
+          globPatterns: ['**/*.{js,css,html,ico,png,svg,woff,woff2,json}'],
+          // Sin esto, ?servicio=... no coincide con el precache y el SW devuelve index.html
+          ignoreURLParametersMatching: [/^utm_/, /^fbclid$/, /^servicio$/],
+          // Las páginas estáticas NO deben caer al index.html de la SPA
+          navigateFallbackDenylist: [/turnos\.html/, /servicios\.html/, /pagina\.html/],
           runtimeCaching: [
             {
               urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
