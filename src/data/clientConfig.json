@@ -156,60 +156,43 @@
       },
       "animation": "bounce",
       "active": true,
-      "clicks": 2,
+      "clicks": 0,
       "category": "community"
     }
   ],
   "theme": {
-    "presetId": "oasis",
+    "presetId": "elamor",
     "bgType": "gradient",
-    "bgGradient": "from-emerald-950 via-teal-950 to-slate-950",
-    "bgSolidColor": "#022c22",
+    "bgGradient": "from-amber-950 via-slate-950 to-rose-950",
+    "bgSolidColor": "#0f172a",
     "cardStyle": "glass",
-    "cardBgColor": "rgba(6, 78, 59, 0.45)",
-    "cardTextColor": "#ecfdf5",
-    "cardBorderColor": "rgba(16, 185, 129, 0.3)",
-    "accentColor": "#10b981",
+    "cardBgColor": "rgba(255, 255, 255, 0.08)",
+    "cardTextColor": "#ffffff",
+    "cardBorderColor": "rgba(245, 158, 11, 0.35)",
+    "accentColor": "#f59e0b",
     "borderRadius": "rounded-2xl",
     "fontStyle": "sans",
     "buttonHoverEffect": "scale",
     "showBackgroundBubbles": true,
     "buttonSpacing": "normal",
-    "buttonGapPx": 42
+    "buttonGapPx": 20
   },
   "password": "admin123",
   "analytics": {
-    "totalVisits": 11,
-    "totalClicks": 2,
-    "recentEvents": [
-      {
-        "id": "ev-1794425596521-2wti",
-        "linkId": "link-courses",
-        "linkTitle": "Cursos e Aulas de Formação",
-        "timestamp": 1794425596521,
-        "device": "desktop",
-        "referrer": "TikTok"
-      },
-      {
-        "id": "ev-1794425586812-z91d",
-        "linkId": "link-courses",
-        "linkTitle": "Cursos e Aulas de Formação",
-        "timestamp": 1794425586812,
-        "device": "desktop",
-        "referrer": "Instagram"
-      }
-    ],
+    "totalVisits": 0,
+    "totalClicks": 0,
+    "recentEvents": [],
     "referrerCounts": {
       "WhatsApp": 0,
-      "Instagram": 1,
+      "Instagram": 0,
       "Directo": 0,
-      "TikTok": 1,
+      "TikTok": 0,
       "YouTube": 0,
       "Google": 0
     },
     "deviceCounts": {
       "mobile": 0,
-      "desktop": 2,
+      "desktop": 0,
       "tablet": 0
     }
   }
