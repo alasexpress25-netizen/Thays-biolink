@@ -160,6 +160,7 @@ export const AdminModal: React.FC<AdminModalProps> = ({
   const [pwaProgressStep, setPwaProgressStep] = useState<string | null>(null);
   const [pwaUploadFile, setPwaUploadFile] = useState<File | null>(null);
   const [pwaUploadPreview, setPwaUploadPreview] = useState<string | null>(null);
+  const [copiedConfig, setCopiedConfig] = useState(false);
 
   const handleDownloadPwaIcons = async () => {
     try {
@@ -284,8 +285,6 @@ export const AdminModal: React.FC<AdminModalProps> = ({
     setShowResetConfirm(false);
     showNotification('¡Todas las métricas y clics se han reiniciado a 0!');
   };
-
-  const [copiedConfig, setCopiedConfig] = useState(false);
 
   // Export clientConfig.json for Agency Repositories
   const handleDownloadClientConfig = () => {
