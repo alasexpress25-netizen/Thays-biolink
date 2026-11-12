@@ -3,18 +3,18 @@
     "name": "Unhas Imbituba",
     "appName": "Thays Biolink",
     "browserTabTitle": "Thays Unhas",
-    "metaDescription": "Nossos link",
+    "metaDescription": "Agende seu horário e fale com a Thays",
     "handle": "@thayanacletounhas",
-    "bio": "Esmaltação em gel e poda - Técnica Russa - Te entrego una cutícula impecáble",
+    "bio": "Esmaltação em gel e técnica russa • Cutículas impecáveis",
     "avatarUrl": "https://images.unsplash.com/photo-1544717305-2782549b5136?w=400&auto=format&fit=crop&q=80",
     "verified": false,
     "location": "Alto Arroio - Imbituba",
     "footerText": "© Thays Anacleto unhas • Unhas Perfeitas",
     "featuredMedia": {
-      "enabled": true,
-      "title": "Uhnas esmaltadas",
-      "subtitle": "Míralo ahora en YouTube ",
-      "tag": "DESTACADO",
+      "enabled": false,
+      "title": "Unhas esmaltadas",
+      "subtitle": "Assista agora no YouTube",
+      "tag": "DESTAQUE",
       "videoUrl": "https://www.youtube.com",
       "thumbnailUrl": "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=800&auto=format&fit=crop&q=80"
     },
@@ -23,41 +23,27 @@
         "id": "soc-1",
         "platform": "whatsapp",
         "label": "WhatsApp",
-        "url": "https://wa.me/5548999053493?text=Hola%20Thays,%20quiero%20saber",
+        "url": "https://wa.me/5548999053493?text=Ol%C3%A1%20Thays,%20quero%20saber%20mais",
         "active": true
       },
       {
         "id": "soc-2",
         "platform": "instagram",
         "label": "Instagram",
-        "url": "https://instagram.com/elamortraspasa",
-        "active": true
-      },
-      {
-        "id": "soc-3",
-        "platform": "youtube",
-        "label": "YouTube",
-        "url": "https://youtube.com/@elamortraspasa",
-        "active": true
-      },
-      {
-        "id": "soc-6",
-        "platform": "email",
-        "label": "Contacto",
-        "url": "mailto:contacto@elamortraspasa.com",
+        "url": "https://instagram.com/thayanacletounhas",
         "active": true
       }
     ],
     "customTexts": {
       "topBarButtonText": "Configurar",
-      "topBarLiveBadge": "clique ao vivo",
+      "topBarLiveBadge": "ao vivo",
       "shareModalButtonText": "Ver Código QR e Compartilhar",
       "categoryAll": "Todos",
       "categoryCommunity": "",
       "categoryMultimedia": "",
       "categoryDonations": "",
-      "emptyStateText": "No hay enlaces en esta categoría.",
-      "verifiedBadgeText": "Cursos e atendimento"
+      "emptyStateText": "Nenhum link nesta categoria.",
+      "verifiedBadgeText": ""
     },
     "pwaIconUrl": "https://images.unsplash.com/photo-1519817650390-64a93db51149?w=400&auto=format&fit=crop&q=80",
     "companyBranding": {
@@ -79,117 +65,58 @@
     "services": [
       {
         "id": "srv-1",
-        "name": "Asesoría Personalizada",
-        "duration": "45 min",
-        "price": "$50 USD",
-        "description": "Sesión 1 a 1 de consultoría estratégica, análisis de requerimientos y plan de acción inmediato.",
-        "icon": "💼",
-        "badge": "MÁS ELEGIDO",
+        "name": "Esmaltação em gel",
+        "duration": "",
+        "price": "",
+        "description": "Esmaltação em gel com acabamento perfeito e durabilidade.",
+        "icon": "💅",
+        "badge": "",
         "active": true
       },
       {
         "id": "srv-2",
-        "name": "Consulta / Turno General",
-        "duration": "30 min",
-        "price": "$30 USD",
-        "description": "Atención general, dudas técnicas o comerciales y diagnóstico inicial.",
-        "icon": "🗓️",
-        "badge": "RÁPIDO",
-        "active": true
-      },
-      {
-        "id": "srv-3",
-        "name": "Presupuesto de Proyecto",
-        "duration": "30 min",
-        "price": "Gratis",
-        "description": "Evaluación personalizada sin costo para sitios web, tiendas online y marketing digital.",
-        "icon": "📊",
-        "badge": "SIN COSTO",
-        "active": true
-      },
-      {
-        "id": "srv-4",
-        "name": "Reunión Virtual (Online)",
-        "duration": "45 min",
-        "price": "$45 USD",
-        "description": "Videollamada por Google Meet / Zoom con pantalla compartida y asesoramiento en vivo.",
-        "icon": "💻",
-        "badge": "ONLINE",
-        "active": true
-      },
-      {
-        "id": "srv-5",
-        "name": "Turno Presencial",
-        "duration": "60 min",
-        "price": "$65 USD",
-        "description": "Encuentro presencial para coordinación integral, firma de acuerdos y revisión.",
-        "icon": "📍",
-        "badge": "PRESENCIAL",
+        "name": "Cutículas – Técnica Russa",
+        "duration": "",
+        "price": "",
+        "description": "Remoção de cutículas com técnica russa, resultado impecável.",
+        "icon": "✨",
+        "badge": "",
         "active": true
       }
-    ]
+    ],
+    "defaultLang": "pt"
   },
   "services": [
     {
       "id": "srv-1",
-      "name": "Asesoría Personalizada",
-      "duration": "45 min",
-      "price": "$50 USD",
-      "description": "Sesión 1 a 1 de consultoría estratégica, análisis de requerimientos y plan de acción inmediato.",
-      "icon": "💼",
-      "badge": "MÁS ELEGIDO",
+      "name": "Esmaltação em gel",
+      "duration": "",
+      "price": "",
+      "description": "Esmaltação em gel com acabamento perfeito e durabilidade.",
+      "icon": "💅",
+      "badge": "",
       "active": true
     },
     {
       "id": "srv-2",
-      "name": "Consulta / Turno General",
-      "duration": "30 min",
-      "price": "$30 USD",
-      "description": "Atención general, dudas técnicas o comerciales y diagnóstico inicial.",
-      "icon": "🗓️",
-      "badge": "RÁPIDO",
-      "active": true
-    },
-    {
-      "id": "srv-3",
-      "name": "Presupuesto de Proyecto",
-      "duration": "30 min",
-      "price": "Gratis",
-      "description": "Evaluación personalizada sin costo para sitios web, tiendas online y marketing digital.",
-      "icon": "📊",
-      "badge": "SIN COSTO",
-      "active": true
-    },
-    {
-      "id": "srv-4",
-      "name": "Reunión Virtual (Online)",
-      "duration": "45 min",
-      "price": "$45 USD",
-      "description": "Videollamada por Google Meet / Zoom con pantalla compartida y asesoramiento en vivo.",
-      "icon": "💻",
-      "badge": "ONLINE",
-      "active": true
-    },
-    {
-      "id": "srv-5",
-      "name": "Turno Presencial",
-      "duration": "60 min",
-      "price": "$65 USD",
-      "description": "Encuentro presencial para coordinación integral, firma de acuerdos y revisión.",
-      "icon": "📍",
-      "badge": "PRESENCIAL",
+      "name": "Cutículas – Técnica Russa",
+      "duration": "",
+      "price": "",
+      "description": "Remoção de cutículas com técnica russa, resultado impecável.",
+      "icon": "✨",
+      "badge": "",
       "active": true
     }
   ],
   "links": [
     {
       "id": "link-whatsapp-group",
-      "title": "Comunidade Oficial no WhatsApp",
-      "subtitle": "Mensagens, Consultas e outros",
-      "url": "https://wa.me/5548999053493",
+      "title": "Fale comigo no WhatsApp",
+      "subtitle": "Agendamentos e dúvidas",
+      "url": "https://wa.me/5548999053493?text=Ol%C3%A1%20Thays,%20quero%20saber%20mais",
       "icon": "whatsapp",
       "badge": {
-        "text": "MÁS POPULAR",
+        "text": "AGENDAR",
         "color": "emerald"
       },
       "animation": "pulse",
@@ -209,6 +136,23 @@
       }
     },
     {
+      "id": "link-turnos-whatsapp",
+      "title": "Agendar horário",
+      "subtitle": "Escolha o serviço e envie pelo WhatsApp",
+      "url": "#turnos",
+      "icon": "calendar",
+      "iconType": "standard",
+      "badge": {
+        "text": "NOVO",
+        "color": "amber"
+      },
+      "animation": "none",
+      "active": true,
+      "clicks": 0,
+      "isPinned": false,
+      "category": "community"
+    },
+    {
       "id": "link-youtube-live",
       "title": "Transmissão ao vivo",
       "subtitle": "Junte-se",
@@ -219,7 +163,7 @@
         "color": "red"
       },
       "animation": "glow",
-      "active": true,
+      "active": false,
       "clicks": 0,
       "isPinned": true,
       "category": "multimedia",
@@ -259,8 +203,8 @@
         "color": "amber"
       },
       "animation": "bounce",
-      "active": true,
-      "clicks": 2,
+      "active": false,
+      "clicks": 0,
       "category": "community"
     }
   ],
@@ -281,39 +225,21 @@
     "buttonSpacing": "normal",
     "buttonGapPx": 42
   },
-  "password": "admin123",
   "analytics": {
-    "totalVisits": 33,
-    "totalClicks": 2,
-    "recentEvents": [
-      {
-        "id": "ev-1794425596521-2wti",
-        "linkId": "link-courses",
-        "linkTitle": "Cursos e Aulas de Formação",
-        "timestamp": 1794425596521,
-        "device": "desktop",
-        "referrer": "TikTok"
-      },
-      {
-        "id": "ev-1794425586812-z91d",
-        "linkId": "link-courses",
-        "linkTitle": "Cursos e Aulas de Formação",
-        "timestamp": 1794425586812,
-        "device": "desktop",
-        "referrer": "Instagram"
-      }
-    ],
+    "totalVisits": 0,
+    "totalClicks": 0,
+    "recentEvents": [],
     "referrerCounts": {
       "WhatsApp": 0,
-      "Instagram": 1,
+      "Instagram": 0,
       "Directo": 0,
-      "TikTok": 1,
+      "TikTok": 0,
       "YouTube": 0,
       "Google": 0
     },
     "deviceCounts": {
       "mobile": 0,
-      "desktop": 2,
+      "desktop": 0,
       "tablet": 0
     }
   }

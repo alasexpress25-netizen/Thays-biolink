@@ -1,63 +1,7 @@
 import { LinkItem, ProfileConfig, ThemeConfig, AnalyticsData, ThemePresetId, ServiceItem } from '../types';
 import clientConfig from './clientConfig.json';
 
-export const DEFAULT_SERVICES: ServiceItem[] = (clientConfig as any).services || (clientConfig.profile as any)?.services || [
-  {
-    id: 'srv-1',
-    name: 'Asesoría Personalizada',
-    duration: '45 min',
-    price: '$50 USD',
-    description: 'Sesión 1 a 1 de consultoría estratégica, análisis de requerimientos y plan de acción inmediato.',
-    icon: '💼',
-    badge: 'MÁS ELEGIDO',
-    active: true,
-  },
-  {
-    id: 'srv-2',
-    name: 'Consulta / Turno General',
-    duration: '30 min',
-    price: '$30 USD',
-    description: 'Atención general, dudas técnicas o comerciales y diagnóstico inicial.',
-    icon: '🗓️',
-    badge: 'RÁPIDO',
-    active: true,
-  },
-  {
-    id: 'srv-3',
-    name: 'Presupuesto de Proyecto',
-    duration: '30 min',
-    price: 'Gratis',
-    description: 'Evaluación personalizada sin costo para sitios web, tiendas online y marketing digital.',
-    icon: '📊',
-    badge: 'SIN COSTO',
-    active: true,
-  },
-  {
-    id: 'srv-4',
-    name: 'Reunión Virtual (Online)',
-    duration: '45 min',
-    price: '$45 USD',
-    description: 'Videollamada por Google Meet / Zoom con pantalla compartida y asesoramiento en vivo.',
-    icon: '💻',
-    badge: 'ONLINE',
-    active: true,
-  },
-  {
-    id: 'srv-5',
-    name: 'Turno Presencial',
-    duration: '60 min',
-    price: '$65 USD',
-    description: 'Encuentro presencial para coordinación integral, firma de acuerdos y revisión.',
-    icon: '📍',
-    badge: 'PRESENCIAL',
-    active: true,
-  },
-];
-
-export const DEFAULT_PROFILE: ProfileConfig = {
-  ...(clientConfig.profile as ProfileConfig),
-  services: (clientConfig.profile as any)?.services || DEFAULT_SERVICES,
-};
+export const DEFAULT_PROFILE: ProfileConfig = clientConfig.profile as ProfileConfig;
 export const DEFAULT_LINKS: LinkItem[] = clientConfig.links as LinkItem[];
 
 export const THEME_PRESETS: Record<ThemePresetId, ThemeConfig> = {
@@ -188,3 +132,5 @@ export const INITIAL_ANALYTICS: AnalyticsData = (clientConfig as any).analytics 
     tablet: 0,
   },
 };
+
+export const DEFAULT_SERVICES: ServiceItem[] = (clientConfig as any).services || [];

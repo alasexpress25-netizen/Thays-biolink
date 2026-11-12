@@ -1,422 +1,339 @@
-import React, { useState } from 'react';
-import { X, Calendar, Clock, User, MessageSquare, Check, Sparkles, Phone, ExternalLink } from 'lucide-react';
-
+import React, { useEffect, useMemo, useState } from 'react';
+import { X, ExternalLink, AlertTriangle } from 'lucide-react';
 import { ServiceItem } from '../types';
+import { useLanguage } from '../i18n/LanguageContext';
+import { LanguageSwitch } from './LanguageSwitch';
 
 interface AppointmentModalProps {
   isOpen: boolean;
   onClose: () => void;
-  whatsappNumber?: string;
-  brandName?: string;
+  whatsappNumber: string; // vacío = el cliente todavía no configuró su WhatsApp
+  brandName: string;
   services?: ServiceItem[];
-  initialServiceName?: string;
 }
 
-const FALLBACK_SERVICES: ServiceItem[] = [
-  { id: 'asesoria', name: 'Asesoría Personalizada', duration: '45 min', price: '$50 USD', description: 'Consultoría estratégica 1 a 1', icon: '💼', active: true },
-  { id: 'consulta', name: 'Consulta / Turno General', duration: '30 min', price: '$30 USD', description: 'Dudas y diagnóstico rápido', icon: '🗓️', active: true },
-  { id: 'presupuesto', name: 'Presupuesto de Proyecto', duration: '30 min', price: 'Gratis', description: 'Evaluación personalizada sin costo', icon: '📊', active: true },
-  { id: 'virtual', name: 'Reunión Virtual (Online)', duration: '45 min', price: '$45 USD', description: 'Videollamada en vivo', icon: '💻', active: true },
-  { id: 'presencial', name: 'Turno Presencial', duration: '60 min', price: '$65 USD', description: 'Encuentro presencial', icon: '📍', active: true },
-];
+const TIME_SLOTS = ['09:00', '10:00', '11:00', '14:00', '15:00', '16:30', '17:30', '18:30'];
 
-const TIME_SLOTS = [
-  '09:00',
-  '10:00',
-  '11:00',
-  '14:00',
-  '15:00',
-  '16:30',
-  '17:30',
-  '18:30',
-];
+const toISODate = (d: Date) => {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+};
 
 export const AppointmentModal: React.FC<AppointmentModalProps> = ({
   isOpen,
   onClose,
-  whatsappNumber = '5548999053493',
-  brandName = 'Atención al Cliente',
+  whatsappNumber,
+  brandName,
   services,
-  initialServiceName,
 }) => {
-  // Available active services
-  const availableServices: ServiceItem[] = React.useMemo(() => {
-    if (services && services.length > 0) {
-      const activeList = services.filter((s) => s.active !== false);
-      if (activeList.length > 0) return activeList;
+  const { t, lang } = useLanguage();
+  const b = t.booking;
+
+  // Si el cliente cargó sus servicios se usan esos (tal cual); si no, los de ejemplo en el idioma activo.
+  const activeServices = useMemo(() => {
+    const own = (services || []).filter((s) => s.active !== false);
+    return own.length > 0 ? own : t.fallbackServices.filter((s) => s.active);
+  }, [services, t]);
+
+  const todayStr = toISODate(new Date());
+  const tomorrowStr = toISODate(new Date(Date.now() + 86400000));
+
+  const [serviceId, setServiceId] = useState<string>('');
+  const [date, setDate] = useState(tomorrowStr);
+  const [time, setTime] = useState('10:00');
+  const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [notes, setNotes] = useState('');
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (!activeServices.some((s) => s.id === serviceId)) {
+      setServiceId(activeServices[0]?.id || '');
     }
-    return FALLBACK_SERVICES;
-  }, [services]);
+  }, [activeServices, serviceId]);
 
-  // Clean phone number (only digits)
-  const cleanNumber = whatsappNumber.replace(/\D/g, '') || '5548999053493';
-
-  // Today as minimum date string YYYY-MM-DD
-  const today = new Date().toISOString().split('T')[0];
-
-  // Tomorrow
-  const tomorrowDate = new Date();
-  tomorrowDate.setDate(tomorrowDate.getDate() + 1);
-  const tomorrow = tomorrowDate.toISOString().split('T')[0];
-
-  // State
-  const defaultSelected = initialServiceName || (availableServices[0] ? availableServices[0].name : 'Consulta General');
-  const [selectedService, setSelectedService] = useState(defaultSelected);
-  const [selectedDate, setSelectedDate] = useState(tomorrow);
-  const [selectedTime, setSelectedTime] = useState('10:00');
-  const [clientName, setClientName] = useState('');
-  const [clientPhone, setClientPhone] = useState('');
-  const [clientNotes, setClientNotes] = useState('');
-  const [validationError, setValidationError] = useState('');
-
-  // Sync if initialServiceName changes or availableServices change
-  React.useEffect(() => {
-    if (initialServiceName) {
-      setSelectedService(initialServiceName);
-    } else if (availableServices.length > 0 && !availableServices.some(s => s.name === selectedService)) {
-      setSelectedService(availableServices[0].name);
-    }
-  }, [initialServiceName, availableServices]);
+  useEffect(() => {
+    if (!isOpen) return;
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose();
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 
-  // Format date readable (e.g. "Viernes, 14 de Noviembre")
-  const formatDateReadable = (dateStr: string) => {
-    try {
-      const [year, month, day] = dateStr.split('-').map(Number);
-      const d = new Date(year, month - 1, day);
-      return d.toLocaleDateString('es-ES', {
-        weekday: 'short',
-        day: 'numeric',
-        month: 'short',
-        year: 'numeric',
-      });
-    } catch {
-      return dateStr;
+  const configured = whatsappNumber.trim().length > 0;
+  const service = activeServices.find((s) => s.id === serviceId) || activeServices[0];
+
+  const formattedDate = (() => {
+    if (!date) return '';
+    const [y, m, d] = date.split('-').map(Number);
+    return new Date(y, m - 1, d).toLocaleDateString(b.dateLocale, {
+      weekday: 'long',
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+    });
+  })();
+
+  const buildMessage = () => {
+    const m = b.message;
+    const lines: string[] = [m.greeting(brandName), ''];
+    if (service) {
+      lines.push(`${m.service} ${service.name}`);
+      if (service.price) lines.push(`${m.price} ${service.price}`);
+      if (service.duration) lines.push(`${m.duration} ${service.duration}`);
     }
+    lines.push(`${m.date} ${formattedDate}`);
+    lines.push(`${m.time} ${time}${b.hoursSuffix}`);
+    lines.push(`${m.requester} ${name.trim()}`);
+    if (phone.trim()) lines.push(`${m.phone} ${phone.trim()}`);
+    if (notes.trim()) lines.push(`${m.notes} ${notes.trim()}`);
+    lines.push('', m.footer);
+    return lines.join('\n');
   };
 
-  const handleConfirmBooking = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!clientName.trim()) {
-      setValidationError('Por favor ingresa tu nombre completo.');
+    if (!configured) return;
+    if (!name.trim()) {
+      setError(b.nameRequiredError);
       return;
     }
-
-    setValidationError('');
-
-    // Find matching service for price details
-    const matchedService = availableServices.find((s) => s.name === selectedService);
-
-    // Format WhatsApp message
-    const lines = [
-      `👋 *¡Hola ${brandName}! Deseo agendar un turno:*`,
-      ``,
-      `💼 *Servicio:* ${selectedService}`,
-    ];
-
-    if (matchedService?.price) {
-      lines.push(`💵 *Tarifa estimada:* ${matchedService.price}`);
-    }
-    if (matchedService?.duration) {
-      lines.push(`⏱️ *Duración estimada:* ${matchedService.duration}`);
-    }
-
-    lines.push(`📅 *Fecha solicitada:* ${formatDateReadable(selectedDate)} (${selectedDate})`);
-    lines.push(`⏰ *Horario preferido:* ${selectedTime} hs`);
-    lines.push(`👤 *Nombre del solicitante:* ${clientName.trim()}`);
-
-    if (clientPhone.trim()) {
-      lines.push(`📱 *Teléfono de contacto:* ${clientPhone.trim()}`);
-    }
-
-    if (clientNotes.trim()) {
-      lines.push(`📝 *Detalles / Motivo:* ${clientNotes.trim()}`);
-    }
-
-    lines.push(``);
-    lines.push(`_Enviado desde el sistema de reservas del BioLink._`);
-
-    const fullMessage = lines.join('\n');
-    const waUrl = `https://wa.me/${cleanNumber}?text=${encodeURIComponent(fullMessage)}`;
-
-    window.open(waUrl, '_blank', 'noopener,noreferrer');
+    setError('');
+    const url = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(buildMessage())}`;
+    window.open(url, '_blank', 'noopener,noreferrer');
     onClose();
   };
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-md animate-fade-in overflow-y-auto">
-      <div className="relative w-full max-w-lg my-auto bg-slate-900 border border-slate-700/80 rounded-3xl shadow-2xl overflow-hidden flex flex-col text-slate-100 max-h-[92vh]">
-        
-        {/* Header Bar */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-slate-800 bg-slate-950/80 backdrop-blur-md shrink-0">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 flex items-center justify-center shadow-inner">
-              <Calendar className="w-5 h-5" />
-            </div>
-            <div>
-              <h3 className="text-base font-bold text-white flex items-center gap-2">
-                <span>Reserva de Turno por WhatsApp</span>
-                <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                  Directo
-                </span>
-              </h3>
-              <p className="text-xs text-slate-400">
-                Selecciona servicio, fecha y horario. Te confirmamos de inmediato.
-              </p>
-            </div>
-          </div>
+  const optionClass = (selected: boolean) =>
+    `flex items-center justify-between p-3 rounded-xl border cursor-pointer text-xs font-semibold transition-colors ${
+      selected
+        ? 'border-amber-500 bg-amber-500/10 text-white ring-1 ring-amber-500/30'
+        : 'border-slate-800 bg-slate-950 text-slate-300 hover:border-slate-700'
+    }`;
 
-          <button
-            onClick={onClose}
-            className="p-2 text-slate-400 hover:text-white rounded-full bg-slate-800/80 hover:bg-slate-800 transition-colors cursor-pointer"
-            aria-label="Cerrar modal"
-          >
-            <X className="w-4 h-4" />
-          </button>
+  const dateBtnClass = (selected: boolean) =>
+    `flex-1 py-1.5 px-3 rounded-lg text-xs font-semibold border cursor-pointer ${
+      selected
+        ? 'bg-amber-500 text-slate-950 border-amber-500 font-bold'
+        : 'bg-slate-950 border-slate-800 text-slate-300'
+    }`;
+
+  const inputClass =
+    'w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-xs focus:outline-none focus:border-amber-500';
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
+      <div className="relative w-full max-w-lg max-h-[92vh] overflow-y-auto bg-slate-900 border border-slate-700/80 rounded-t-3xl sm:rounded-3xl shadow-2xl text-slate-200">
+        {/* Header */}
+        <div className="sticky top-0 z-10 flex items-start justify-between gap-3 px-5 pt-5 pb-3 bg-slate-900/95 backdrop-blur-md border-b border-slate-800">
+          <div className="min-w-0">
+            <div className="flex items-center gap-2 mb-1">
+              <h3 className="text-base font-bold text-white">{b.title}</h3>
+              <span className="px-2 py-0.5 text-[10px] font-bold rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+                {b.liveTag}
+              </span>
+            </div>
+            <p className="text-[11px] text-slate-400">{b.subtitle}</p>
+          </div>
+          <div className="flex items-center gap-2 shrink-0">
+            <LanguageSwitch />
+            <button
+              type="button"
+              onClick={onClose}
+              aria-label={b.closeAria}
+              className="p-1.5 text-slate-400 hover:text-white rounded-full bg-slate-800 hover:bg-slate-700 transition-colors cursor-pointer"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
         </div>
 
-        {/* Scrollable Form Body */}
-        <form onSubmit={handleConfirmBooking} className="p-5 sm:p-6 overflow-y-auto space-y-5 flex-1">
-          
-          {/* Step 1: Select Service */}
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <label className="block text-xs font-bold text-slate-200 uppercase tracking-wider">
-                1. Elige el Servicio o Consulta
-              </label>
-              <a
-                href="/servicios.html"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-[11px] font-semibold text-amber-400 hover:text-amber-300 flex items-center gap-1 transition-colors underline underline-offset-2"
-              >
-                <span>Ver catálogo y tarifas</span>
-                <ExternalLink className="w-3 h-3" />
-              </a>
+        {!configured ? (
+          <div className="p-6">
+            <div className="flex items-start gap-3 p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-xs">
+              <AlertTriangle className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
+              <div>
+                <div className="font-bold text-white mb-1">{b.notConfiguredTitle}</div>
+                <div className="text-slate-300 leading-relaxed">{b.notConfiguredBody}</div>
+              </div>
             </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              {availableServices.map((srv) => {
-                const isSelected = selectedService === srv.name;
-                return (
-                  <button
-                    key={srv.id}
-                    type="button"
-                    onClick={() => setSelectedService(srv.name)}
-                    className={`flex items-center justify-between p-3 rounded-xl border text-left transition-all cursor-pointer relative ${
-                      isSelected
-                        ? 'bg-amber-500/15 border-amber-500 text-white shadow-sm shadow-amber-500/10 ring-1 ring-amber-500/40'
-                        : 'bg-slate-950 border-slate-800 text-slate-300 hover:border-slate-700'
-                    }`}
-                  >
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit} className="p-5 space-y-5">
+            {/* 1. Servicio */}
+            <div className="space-y-2.5">
+              <div className="flex items-center justify-between">
+                <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider">
+                  {b.step1Title}
+                </label>
+                <a
+                  href="servicios.html"
+                  className="text-[11px] font-semibold text-amber-400 hover:text-amber-300 underline"
+                >
+                  {b.viewCatalog}
+                </a>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                {activeServices.map((s) => (
+                  <label key={s.id} className={optionClass(s.id === serviceId)}>
                     <div className="flex items-center gap-2.5 min-w-0 pr-2">
-                      <span className="text-xl shrink-0">{srv.icon || '💼'}</span>
+                      <span className="text-xl shrink-0">{s.icon || '💼'}</span>
                       <div className="min-w-0">
-                        <div className="text-xs font-bold truncate flex items-center gap-1.5">
-                          <span>{srv.name}</span>
-                          {srv.badge && (
-                            <span className="text-[9px] px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 shrink-0">
-                              {srv.badge}
-                            </span>
-                          )}
-                        </div>
+                        <div className="truncate">{s.name}</div>
                         <div className="flex items-center gap-2 text-[10px] text-slate-400 mt-0.5">
-                          {srv.duration && <span>⏱️ {srv.duration}</span>}
-                          {srv.price && (
-                            <span className="font-semibold text-emerald-400 font-mono">
-                              {srv.price}
-                            </span>
-                          )}
+                          {s.duration && <span>⏱️ {s.duration}</span>}
+                          {s.price && <span className="font-bold text-emerald-400 font-mono">{s.price}</span>}
                         </div>
                       </div>
                     </div>
-                    {isSelected && <Check className="w-4 h-4 text-amber-400 shrink-0" />}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Step 2: Date & Quick Select */}
-          <div className="space-y-2">
-            <label className="block text-xs font-bold text-slate-200 uppercase tracking-wider flex items-center justify-between">
-              <span>2. Selecciona la Fecha</span>
-              <span className="text-[11px] text-slate-400 font-normal">{formatDateReadable(selectedDate)}</span>
-            </label>
-
-            <div className="flex items-center gap-2 mb-2">
-              <button
-                type="button"
-                onClick={() => setSelectedDate(today)}
-                className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-semibold border transition-colors cursor-pointer ${
-                  selectedDate === today
-                    ? 'bg-amber-500 text-slate-950 border-amber-500 font-bold'
-                    : 'bg-slate-950 border-slate-800 text-slate-300 hover:bg-slate-850'
-                }`}
-              >
-                Hoy
-              </button>
-              <button
-                type="button"
-                onClick={() => setSelectedDate(tomorrow)}
-                className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-semibold border transition-colors cursor-pointer ${
-                  selectedDate === tomorrow
-                    ? 'bg-amber-500 text-slate-950 border-amber-500 font-bold'
-                    : 'bg-slate-950 border-slate-800 text-slate-300 hover:bg-slate-850'
-                }`}
-              >
-                Mañana
-              </button>
+                    <input
+                      type="radio"
+                      name="service"
+                      value={s.id}
+                      checked={s.id === serviceId}
+                      onChange={() => setServiceId(s.id)}
+                      className="accent-amber-500 shrink-0"
+                    />
+                  </label>
+                ))}
+              </div>
             </div>
 
-            <div className="relative">
+            {/* 2. Fecha */}
+            <div className="space-y-2">
+              <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider">
+                {b.step2Title}
+              </label>
+              <div className="flex gap-2">
+                <button type="button" onClick={() => setDate(todayStr)} className={dateBtnClass(date === todayStr)}>
+                  {b.today}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setDate(tomorrowStr)}
+                  className={dateBtnClass(date === tomorrowStr)}
+                >
+                  {b.tomorrow}
+                </button>
+              </div>
               <input
                 type="date"
-                min={today}
-                value={selectedDate}
-                onChange={(e) => setSelectedDate(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-xs font-medium focus:outline-none focus:border-emerald-500 [color-scheme:dark]"
+                value={date}
+                min={todayStr}
+                lang={b.dateLocale}
+                onChange={(e) => setDate(e.target.value)}
+                required
+                className={`${inputClass} font-medium [color-scheme:dark]`}
               />
             </div>
-          </div>
 
-          {/* Step 3: Time Slot Chips */}
-          <div className="space-y-2">
-            <label className="block text-xs font-bold text-slate-200 uppercase tracking-wider flex items-center justify-between">
-              <span>3. Elige Horario Preferido</span>
-              <span className="text-[11px] text-emerald-400 font-mono">{selectedTime} hs</span>
-            </label>
-
-            <div className="grid grid-cols-4 gap-2">
-              {TIME_SLOTS.map((time) => {
-                const isSelected = selectedTime === time;
-                return (
+            {/* 3. Horario */}
+            <div className="space-y-2">
+              <label className="flex items-center justify-between text-xs font-bold text-slate-300 uppercase tracking-wider">
+                <span>{b.step3Title}</span>
+                <span className="text-[11px] text-emerald-400 font-mono normal-case">
+                  {time} {b.hoursSuffix}
+                </span>
+              </label>
+              <div className="grid grid-cols-4 gap-2">
+                {TIME_SLOTS.map((slot) => (
                   <button
-                    key={time}
+                    key={slot}
                     type="button"
-                    onClick={() => setSelectedTime(time)}
-                    className={`py-2 px-1 text-center rounded-xl text-xs font-mono font-bold border transition-all cursor-pointer ${
-                      isSelected
-                        ? 'bg-emerald-500 text-slate-950 border-emerald-400 shadow-md shadow-emerald-500/20 scale-105'
-                        : 'bg-slate-950 border-slate-800 text-slate-300 hover:border-slate-700'
+                    onClick={() => setTime(slot)}
+                    className={`py-2 text-center rounded-xl text-xs font-mono font-bold border cursor-pointer transition-all ${
+                      slot === time
+                        ? 'border-emerald-400 bg-emerald-500 text-slate-950 scale-105 shadow-md shadow-emerald-500/20'
+                        : 'border-slate-800 bg-slate-950 text-slate-300 hover:border-slate-700'
                     }`}
                   >
-                    {time}
+                    {slot}
                   </button>
-                );
-              })}
+                ))}
+              </div>
             </div>
-          </div>
 
-          {/* Step 4: Client Info */}
-          <div className="space-y-3 pt-1">
-            <label className="block text-xs font-bold text-slate-200 uppercase tracking-wider">
-              4. Tus Datos de Contacto
-            </label>
-
-            <div>
-              <label className="block text-[11px] font-semibold text-slate-400 mb-1">
-                Tu Nombre y Apellido *
+            {/* 4. Datos */}
+            <div className="space-y-3">
+              <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider">
+                {b.step4Title}
               </label>
-              <div className="relative">
+              <div>
+                <label className="block text-[11px] font-semibold text-slate-400 mb-1">{b.nameLabel}</label>
                 <input
                   type="text"
-                  required
-                  placeholder="Ej: Laura Martínez"
-                  value={clientName}
-                  onChange={(e) => {
-                    setClientName(e.target.value);
-                    if (validationError) setValidationError('');
-                  }}
-                  className="w-full pl-9 pr-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-xs focus:outline-none focus:border-amber-500"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder={b.namePlaceholder}
+                  className={inputClass}
                 />
-                <User className="w-4 h-4 text-slate-500 absolute left-3 top-3 pointer-events-none" />
+                {error && <p className="mt-1 text-[11px] text-rose-400">{error}</p>}
               </div>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label className="block text-[11px] font-semibold text-slate-400 mb-1">
-                  Tu WhatsApp / Teléfono (opcional)
-                </label>
-                <div className="relative">
-                  <input
-                    type="tel"
-                    placeholder="Ej: +54 9 11 2345-6789"
-                    value={clientPhone}
-                    onChange={(e) => setClientPhone(e.target.value)}
-                    className="w-full pl-9 pr-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-xs focus:outline-none focus:border-amber-500"
-                  />
-                  <Phone className="w-4 h-4 text-slate-500 absolute left-3 top-3 pointer-events-none" />
-                </div>
+                <label className="block text-[11px] font-semibold text-slate-400 mb-1">{b.phoneLabel}</label>
+                <input
+                  type="tel"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  placeholder={b.phonePlaceholder}
+                  className={inputClass}
+                />
               </div>
-
               <div>
-                <label className="block text-[11px] font-semibold text-slate-400 mb-1">
-                  Motivo o Consulta (opcional)
-                </label>
-                <div className="relative">
-                  <input
-                    type="text"
-                    placeholder="Ej: Información de precios"
-                    value={clientNotes}
-                    onChange={(e) => setClientNotes(e.target.value)}
-                    className="w-full pl-9 pr-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-xs focus:outline-none focus:border-amber-500"
-                  />
-                  <MessageSquare className="w-4 h-4 text-slate-500 absolute left-3 top-3 pointer-events-none" />
-                </div>
+                <label className="block text-[11px] font-semibold text-slate-400 mb-1">{b.notesLabel}</label>
+                <input
+                  type="text"
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                  placeholder={b.notesPlaceholder}
+                  className={inputClass}
+                />
               </div>
             </div>
-          </div>
 
-          {/* Validation Error */}
-          {validationError && (
-            <div className="p-2.5 rounded-xl bg-rose-500/15 border border-rose-500/30 text-rose-300 text-xs">
-              ⚠️ {validationError}
+            {/* Preview */}
+            <div className="p-3.5 rounded-2xl bg-slate-950/80 border border-slate-800 text-[11px] space-y-1">
+              <div className="font-bold text-slate-400 mb-1">{b.previewLabel}</div>
+              <div>
+                <span className="text-slate-500">{b.previewService}:</span> {service?.name}
+              </div>
+              <div>
+                <span className="text-slate-500">{b.previewDate}:</span> <span className="capitalize">{formattedDate}</span>
+              </div>
+              <div>
+                <span className="text-slate-500">{b.previewTime}:</span> {time}
+                {b.hoursSuffix}
+              </div>
+              <div>
+                <span className="text-slate-500">{b.previewRequester}:</span> {name.trim() || b.previewNoName}
+              </div>
             </div>
-          )}
 
-          {/* Live Preview of WhatsApp message */}
-          <div className="p-3.5 rounded-2xl bg-black/40 border border-emerald-500/20 space-y-1.5 text-xs">
-            <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-wider block">
-              Previsualización del Mensaje para WhatsApp:
-            </span>
-            <div className="text-[11px] font-mono text-slate-300 bg-slate-950/80 p-2.5 rounded-xl border border-slate-800/80 leading-relaxed">
-              👋 <strong>¡Hola {brandName}! Deseo agendar un turno:</strong><br />
-              💼 Servicio: {selectedService}<br />
-              📅 Fecha: {formatDateReadable(selectedDate)}<br />
-              ⏰ Horario: {selectedTime} hs<br />
-              👤 Solicitante: {clientName.trim() || '[Tu Nombre]'}
-            </div>
-          </div>
-
-          {/* Submit CTA Button */}
-          <div className="space-y-2 pt-1">
-            <button
-              type="submit"
-              className="w-full py-3.5 px-5 rounded-2xl bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-400 hover:to-green-500 text-slate-950 font-extrabold text-sm shadow-lg shadow-emerald-500/25 active:scale-[0.99] transition-all flex items-center justify-center gap-2.5 cursor-pointer"
-            >
-              <svg className="w-5 h-5 fill-slate-950" viewBox="0 0 24 24">
-                <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.711 2.598 2.664-.698c.96.549 1.764.846 2.796.846 3.182 0 5.768-2.587 5.768-5.766.001-3.182-2.585-5.771-5.768-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.312.045-.713.064-2.12-.516-1.782-.736-2.936-2.56-3.025-2.679-.089-.119-.724-.963-.724-1.836 0-.873.455-1.303.617-1.478.163-.176.356-.22.474-.22.119 0 .237 0 .341.006.11.006.257-.042.403.31.15.362.516 1.258.562 1.349.046.092.076.199.015.32-.06.12-.091.196-.181.301-.09.106-.189.237-.27.318-.09.091-.184.19-.079.37.105.18.468.772.999 1.246.685.611 1.264.8 1.444.89.18.09.285.076.39-.045.105-.121.45-.526.57-.706.12-.18.24-.15.405-.09.165.06 1.05.495 1.23.585.18.09.3.135.345.21.045.075.045.435-.099.84z"/>
-              </svg>
-              <span>📲 Confirmar y Enviar Turno por WhatsApp</span>
-            </button>
-
-            <div className="flex items-center justify-between text-[11px] text-slate-400 px-1 pt-1">
-              <span>Número: +{cleanNumber}</span>
-              <a
-                href="./turnos.html"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-amber-400 hover:text-amber-300 inline-flex items-center gap-1 hover:underline"
+            <div>
+              <button
+                type="submit"
+                className="w-full py-3.5 px-5 rounded-2xl bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-400 hover:to-green-500 text-slate-950 font-extrabold text-sm shadow-xl shadow-emerald-500/25 active:scale-[0.99] transition-all cursor-pointer"
               >
-                <span>Ver página completa</span>
-                <ExternalLink className="w-3 h-3" />
-              </a>
+                {b.submitButton}
+              </button>
+              <div className="flex items-center justify-between mt-2.5 text-[11px] text-slate-500">
+                <span>
+                  {b.numberLabel}: +{whatsappNumber}
+                </span>
+                <a
+                  href={`turnos.html?lang=${lang}`}
+                  className="inline-flex items-center gap-1 text-amber-400 hover:text-amber-300"
+                >
+                  <span>{b.viewFullPage}</span>
+                  <ExternalLink className="w-3 h-3" />
+                </a>
+              </div>
             </div>
-          </div>
-        </form>
+          </form>
+        )}
       </div>
     </div>
   );
