@@ -78,6 +78,7 @@ import { AVAILABLE_ICONS, IconRenderer } from './IconRenderer';
 import { THEME_PRESETS, DEFAULT_SERVICES } from '../data/defaultData';
 import { ICON_3D_PRESETS } from '../data/icon3dPresets';
 import { AVATAR_PHOTO_PRESETS } from '../data/avatarPhotoPresets';
+import { AVATAR_URL } from '../utils/avatar';
 import { extractYouTubeId, getYouTubeThumbnail, formatSocialUrl } from '../utils/youtube';
 import { downloadPwaIconSet } from '../utils/pwaIcons';
 
@@ -101,24 +102,6 @@ interface AdminModalProps {
 
 type TabType = 'analytics' | 'links' | 'services' | 'video' | 'social' | 'texts' | 'appearance' | 'security' | 'backup';
 
-const AVATAR_PRESETS = [
-  {
-    name: 'El Amor Traspasa',
-    url: 'https://images.unsplash.com/photo-1544717305-2782549b5136?w=400&auto=format&fit=crop&q=80',
-  },
-  {
-    name: 'Comunidad & Luz',
-    url: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=400&auto=format&fit=crop&q=80',
-  },
-  {
-    name: 'Retiro & Alabanza',
-    url: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=400&auto=format&fit=crop&q=80',
-  },
-  {
-    name: 'Cruz Dorada Minimal',
-    url: 'https://images.unsplash.com/photo-1519817650390-64a93db51149?w=400&auto=format&fit=crop&q=80',
-  },
-];
 
 export const AdminModal: React.FC<AdminModalProps> = ({
   isOpen,
@@ -185,7 +168,7 @@ export const AdminModal: React.FC<AdminModalProps> = ({
   const handleDownloadPwaIcons = async () => {
     try {
       setIsGeneratingIcons(true);
-      const source = pwaUploadFile || profile.pwaIconUrl || profile.avatarUrl;
+      const source = pwaUploadFile || profile.pwaIconUrl || AVATAR_URL;
       await downloadPwaIconSet(source, (filename) => {
         setPwaProgressStep(`Generando y descargando ${filename}...`);
       });
@@ -3986,44 +3969,10 @@ export const AdminModal: React.FC<AdminModalProps> = ({
 
               {/* Avatar & Photo Settings */}
               <div className="p-5 rounded-2xl bg-slate-950 border border-slate-800 space-y-4">
-                <h4 className="text-sm font-bold text-white mb-2">Foto de Perfil & Avatar</h4>
+                <h4 className="text-sm font-bold text-white mb-2">Insignia de Perfil</h4>
+                <p className="text-[11px] text-slate-400 -mt-1">La foto de perfil se carga desde el repositorio (<span className="font-mono text-slate-300">public/avatar.jpg</span>).</p>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="sm:col-span-2">
-                    <label className="block text-xs font-semibold text-slate-300 mb-1">
-                      URL del Avatar / Foto de Perfil
-                    </label>
-                    <input
-                      type="url"
-                      value={profile.avatarUrl}
-                      onChange={(e) => {
-                        const updated = { ...profile, avatarUrl: e.target.value };
-                        onUpdateProfile(updated);
-                        storageService.saveProfile(updated);
-                      }}
-                      className="w-full px-3 py-2 text-xs rounded-xl bg-slate-900 border border-slate-800 text-white focus:outline-none focus:border-amber-500 font-mono mb-2"
-                    />
-
-                    {/* Presets Avatars */}
-                    <div className="flex items-center gap-2 mt-2 flex-wrap">
-                      <span className="text-[11px] text-slate-400">Presets rápidos:</span>
-                      {AVATAR_PRESETS.map((p, i) => (
-                        <button
-                          key={i}
-                          type="button"
-                          onClick={() => {
-                            const updated = { ...profile, avatarUrl: p.url };
-                            onUpdateProfile(updated);
-                            storageService.saveProfile(updated);
-                          }}
-                          className="text-[10px] px-2.5 py-1 rounded bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 cursor-pointer"
-                        >
-                          {p.name}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
                   <div>
                     <label className="block text-xs font-semibold text-slate-300 mb-1">
                       Insignia de Cuenta Verificada
@@ -4128,8 +4077,8 @@ export const AdminModal: React.FC<AdminModalProps> = ({
                           type="button"
                           onClick={() => {
                             setPwaUploadFile(null);
-                            setPwaUploadPreview(profile.avatarUrl);
-                            const updated = { ...profile, pwaIconUrl: profile.avatarUrl };
+                            setPwaUploadPreview(AVATAR_URL);
+                            const updated = { ...profile, pwaIconUrl: AVATAR_URL };
                             onUpdateProfile(updated);
                             storageService.saveProfile(updated);
                             showNotification('Usando tu foto de perfil como icono PWA');
@@ -4196,7 +4145,7 @@ export const AdminModal: React.FC<AdminModalProps> = ({
                       <span className="text-[10px] text-slate-400 mb-1.5 font-medium">Previsualización</span>
                       <div className="relative w-16 h-16 rounded-2xl overflow-hidden shadow-xl border-2 border-amber-400/50 p-0.5 bg-slate-950">
                         <img
-                          src={pwaUploadPreview || profile.pwaIconUrl || profile.avatarUrl || 'pwa-512x512.png'}
+                          src={pwaUploadPreview || profile.pwaIconUrl || AVATAR_URL || 'pwa-512x512.png'}
                           alt="PWA Icon Preview"
                           className="w-full h-full object-cover rounded-xl"
                           onError={(e) => {
